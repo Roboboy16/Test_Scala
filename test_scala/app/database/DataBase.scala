@@ -5,10 +5,10 @@ import java.sql._
 import models.Data
 
 object DataBase {
-  val url = "jdbc:mysql://f0431629.xsph.ru/f0431629_TestScala?useSSL=false"
-  private val username = "f0431629"
-  private val password = "xeciutegzu"
-  private val tableName = "Data"
+  val url = ""
+  private val username = ""
+  private val password = ""
+  private val tableName = ""
   private var connection : java.sql.Connection = DriverManager.getConnection(url,username,password)
   def openConnection(): Unit = {
     connection = DriverManager.getConnection(url,username,password)
