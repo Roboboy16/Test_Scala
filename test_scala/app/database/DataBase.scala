@@ -9,20 +9,25 @@ object DataBase {
   private val username = "f0431629"
   private val password = "xeciutegzu"
   private val tableName = "Data"
-  private var connection : java.sql.Connection = DriverManager.getConnection(url,username,password)
+  private var connection:Connection = {
+    val buffer = DriverManager.getConnection(url,username,password)
+    buffer.close()
+    buffer
+  }
   def openConnection(): Unit = {
+    if (connection.isClosed)
     connection = DriverManager.getConnection(url,username,password)
   }
   def closeConnection(): Unit = {
     connection.close()
   }
   def addRecord(value1: String, value2: String, row1:String, row2:String): Unit = {
-    var sqlCommand = s"INSERT INTO ${tableName} (${row1},${row2}) VALUES ('${value1}','${value2}')"
+    val sqlCommand = s"INSERT INTO ${tableName} (${row1},${row2}) VALUES ('${value1}','${value2}')"
     executeSqlCommand(sqlCommand)
   }
   def getAllRecords():List[Data] = {
     var list= List[Data]()
-    var sqlCommand = s"SELECT * FROM ${tableName}"
+    val sqlCommand = s"SELECT * FROM ${tableName}"
     this.openConnection()
     val statement = connection.createStatement()
     var resultSet = statement.executeQuery(sqlCommand)
@@ -37,7 +42,7 @@ object DataBase {
   def changeRecord(id : Int, value1: String, value2: String, row1:String, row2:String): Either[String,Unit] = {
     if (!existRecord(id)) Left("Record doesn't exist")
     else {
-      var sqlCommand = s"UPDATE ${tableName} SET ${row1} = '${value1}', ${row2} = '${value2}' WHERE id=${id}"
+      val sqlCommand = s"UPDATE ${tableName} SET ${row1} = '${value1}', ${row2} = '${value2}' WHERE id=${id}"
       executeSqlCommand(sqlCommand)
       Right()
     }
@@ -45,7 +50,7 @@ object DataBase {
   def deleteRecord(id:Int): Either[String,Unit] = {
     if (!existRecord(id)) Left("Record doesn't exist")
     else {
-      var sqlCommand = s"DELETE FROM ${tableName} WHERE id=${id}"
+      val sqlCommand = s"DELETE FROM ${tableName} WHERE id=${id}"
       executeSqlCommand(sqlCommand)
       Right()
     }
@@ -53,7 +58,7 @@ object DataBase {
 
   def searchBySubstring (subString:String,column:Int): List[Data] = {
     var list = List[Data]()
-    var sqlCommand = s"SELECT * FROM ${tableName}"
+    val sqlCommand = s"SELECT * FROM ${tableName}"
     this.openConnection()
     val statement = connection.createStatement()
     var resultSet = statement.executeQuery(sqlCommand)
