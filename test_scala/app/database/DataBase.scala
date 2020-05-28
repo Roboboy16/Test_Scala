@@ -5,7 +5,7 @@ import java.sql._
 import models.Data
 
 object DataBase {
-  val url = "jdbc:mysql://f0431629.xsph.ru/f0431629_TestScala?useSsl=false"
+  private val url = "jdbc:mysql://f0431629.xsph.ru/f0431629_TestScala?useSSL=false"
   private val username = "f0431629"
   private val password = "xeciutegzu"
   private val tableName = "Data"

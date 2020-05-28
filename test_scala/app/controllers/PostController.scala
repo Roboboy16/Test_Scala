@@ -81,7 +81,7 @@ class PostController @Inject()(val controllerComponents: ControllerComponents) e
       case Nil =>
         BadRequest(Json.obj("message" -> "Didn't find"))
       case _ =>
-        val json = Json.toJson(DataBase.searchBySubstring(substring,columnToSearch))
+        val json = Json.toJson(founded)
         Ok(json)
     }
   }
