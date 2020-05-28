@@ -5,7 +5,7 @@ import java.sql._
 import models.Data
 
 object DataBase {
-  val url = "jdbc:mysql://f0431629.xsph.ru/f0431629_TestScala?useSSL=false"
+  val url = "jdbc:mysql://f0431629.xsph.ru/f0431629_TestScala?useSsl=false"
   private val username = "f0431629"
   private val password = "xeciutegzu"
   private val tableName = "Data"
@@ -20,7 +20,7 @@ object DataBase {
     var sqlCommand = s"INSERT INTO ${tableName} (${row1},${row2}) VALUES ('${value1}','${value2}')"
     executeSqlCommand(sqlCommand)
   }
-  val getAllRecords:List[Data] = {
+  def getAllRecords():List[Data] = {
     var list= List[Data]()
     var sqlCommand = s"SELECT * FROM ${tableName}"
     this.openConnection()
@@ -34,13 +34,21 @@ object DataBase {
     this.closeConnection()
     list.reverse
   }
-  def changeRecord(id : Int, value1: String, value2: String, row1:String, row2:String): Unit = {
-    var sqlCommand = s"UPDATE ${tableName} SET ${row1} = '${value1}', ${row2} = '${value2}' WHERE id=${id}"
-    executeSqlCommand(sqlCommand)
+  def changeRecord(id : Int, value1: String, value2: String, row1:String, row2:String): Either[String,Unit] = {
+    if (!existRecord(id)) Left("Record doesn't exist")
+    else {
+      var sqlCommand = s"UPDATE ${tableName} SET ${row1} = '${value1}', ${row2} = '${value2}' WHERE id=${id}"
+      executeSqlCommand(sqlCommand)
+      Right()
+    }
   }
-  def deleteRecord(id:Int): Unit = {
-    var sqlCommand = s"DELETE FROM ${tableName} WHERE id=${id}"
-    executeSqlCommand(sqlCommand)
+  def deleteRecord(id:Int): Either[String,Unit] = {
+    if (!existRecord(id)) Left("Record doesn't exist")
+    else {
+      var sqlCommand = s"DELETE FROM ${tableName} WHERE id=${id}"
+      executeSqlCommand(sqlCommand)
+      Right()
+    }
   }
 
   def searchBySubstring (subString:String,column:Int): List[Data] = {
@@ -58,11 +66,24 @@ object DataBase {
     this.closeConnection()
     list.reverse
   }
-  def executeSqlCommand(sqlCommand:String): Unit = {
+
+private  def executeSqlCommand(sqlCommand:String): Unit = {
     this.openConnection()
     val statement = connection.createStatement()
     statement.executeUpdate(sqlCommand)
     statement.close()
     this.closeConnection()
+  }
+
+private  def existRecord(id:Int):Boolean = {
+    val sqlCommand = s"SELECT * FROM ${tableName} WHERE id=${id}"
+    this.openConnection()
+    val statement = connection.createStatement()
+    val resultSet = statement.executeQuery(sqlCommand)
+    val hasNext = resultSet.next()
+    resultSet.close()
+    statement.close()
+    this.closeConnection()
+    hasNext
   }
 }

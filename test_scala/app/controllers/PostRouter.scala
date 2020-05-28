@@ -16,6 +16,8 @@ class PostRouter @Inject()(cc: PostController) extends SimpleRouter{
       cc.search(substring,2)
     case GET(p"/phones/searchByName" ? q"numberSubstring=$substring") =>
       cc.search(substring,3)
+    case DELETE(p"/phone/$id") =>
+      cc.deleteValue(id.toInt)
     case GET(p"/phones") =>
       cc.getAllValues()
   }

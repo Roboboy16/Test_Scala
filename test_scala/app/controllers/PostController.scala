@@ -33,7 +33,7 @@ class PostController @Inject()(val controllerComponents: ControllerComponents) e
   }
 
   def getAllValues = Action {
-    val json = Json.toJson(DataBase.getAllRecords)
+    val json = Json.toJson(DataBase.getAllRecords())
     Ok(json)
   }
 
@@ -46,8 +46,12 @@ class PostController @Inject()(val controllerComponents: ControllerComponents) e
       data => {
         data.number match {
           case Data.numberFormat() =>
-            DataBase.changeRecord(id,data.name,data.number,"name","number")
-            Ok(Json.obj("message"-> "success"))
+            DataBase.changeRecord(id,data.name,data.number,"name","number") match {
+              case Left(x) =>
+                BadRequest(Json.obj("Error"->x))
+              case _ =>
+                Ok(Json.obj("message"-> "success"))
+            }
           case _ =>
             BadRequest(Json.obj("Error" -> "Invalid number format"))
         }
@@ -61,14 +65,24 @@ class PostController @Inject()(val controllerComponents: ControllerComponents) e
         BadRequest(Json.obj("message" -> JsError.toJson(errors)))
       },
       data => {
-        DataBase.deleteRecord(id)
-        Ok(Json.obj("message"-> "success"))
+        DataBase.deleteRecord(id) match {
+          case Left(x) =>
+            BadRequest(Json.obj("Error"->x))
+          case _ =>
+            Ok(Json.obj("message"-> "success"))
+        }
       }
     )
   }
 
   def search(substring:String,columnToSearch:Int) = Action {
-    val json = Json.toJson(DataBase.searchBySubstring(substring,columnToSearch))
-    Ok(json)
+    var founded = DataBase.searchBySubstring(substring,columnToSearch)
+    founded match {
+      case Nil =>
+        BadRequest(Json.obj("message" -> "Didn't find"))
+      case _ =>
+        val json = Json.toJson(DataBase.searchBySubstring(substring,columnToSearch))
+        Ok(json)
+    }
   }
 }
