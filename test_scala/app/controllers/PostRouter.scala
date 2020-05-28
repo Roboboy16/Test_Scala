@@ -20,5 +20,7 @@ class PostRouter @Inject()(cc: PostController) extends SimpleRouter{
       cc.deleteValue(id.toInt)
     case GET(p"/phones") =>
       cc.getAllValues()
+    case _ =>
+      cc.index()
   }
 }

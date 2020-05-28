@@ -14,6 +14,10 @@ import scala.concurrent.Future
 @Singleton
 class PostController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
 
+  def index() = Action{ request=>
+    Ok(views.html.index())
+  }
+
   def addNewRecord = Action(parse.json) { request =>
     val dataResult = request.body.validate[Data]
     dataResult.fold(
